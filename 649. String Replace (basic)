@@ -1,0 +1,61 @@
+public class Solution {
+  public String replace(String input, String source, String target) {
+    // Write your solution here
+    // corner cases
+    if (input == null || source == null || target == null) {
+      return input;
+    }
+    if (input == "" || source == "") {
+      return input;
+    }
+    char[] inputArray = input.toCharArray();
+    char[] sourceArray = source.toCharArray();
+    char[] targetArray = target.toCharArray();
+    int inputLen = inputArray.length;
+    int sourceLen = sourceArray.length;
+    int targetLen = targetArray.length;
+    int countSource = 0;
+    int slow = 0;
+    int fast = 0;
+    char start = sourceArray[0];
+    // count how many cources, and add the starting postion into a set
+    HashSet<Integer> set = new HashSet<>();
+    while (slow < inputLen && fast < inputLen) {
+      if (inputArray[fast] != start) {
+        fast ++;
+      } else {
+        slow = fast;
+        while (fast < inputLen && (fast - slow < sourceLen) && inputArray[fast] == sourceArray[fast - slow] ) {
+          fast ++;
+        }
+        if (fast - slow == sourceLen) {
+          countSource ++;
+          set.add(slow);
+        } else {
+          fast = slow + 1;
+        }
+      }
+    }
+    // add non-source elements and replaced source (target) into result Array
+    char[] resultArray = new char[inputLen + countSource * (targetLen - sourceLen)];
+    fast = 0;
+    int targetIndex = 0;
+    while (fast < inputLen) {
+      if(set.contains(fast)){
+        targetIndex = addTarget(resultArray, targetArray, targetIndex);
+        fast += sourceLen;
+      } else {
+        resultArray[targetIndex ++] = inputArray[fast ++];
+      }
+    }
+    return new String(resultArray);
+  }
+  private int addTarget(char[] resultArray, char[] targetArray, int j) {
+    for (int i = 0; i < targetArray.length; i ++) {
+      resultArray[j + i] = targetArray[i];
+    }
+    return j + targetArray.length;
+  }
+}
+// Time: O(n)
+// Space: O(1)
