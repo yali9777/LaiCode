@@ -15,41 +15,48 @@ public class Solution {
     int sourceLen = sourceArray.length;
     int targetLen = targetArray.length;
     int countSource = 0;
-    int slow = 0;
-    int fast = 0;
+    int i = 0; // used to loop through inputArray
     char start = sourceArray[0];
     // count how many cources, and add the starting postion into a set
     HashSet<Integer> set = new HashSet<>();
-    while (slow < inputLen && fast < inputLen) {
-      if (inputArray[fast] != start) {
-        fast ++;
+    while (i < inputLen) {
+      if (inputArray[i] != start || !equals(inputArray, sourceArray, i)) {
+        i ++;
       } else {
-        slow = fast;
-        while (fast < inputLen && (fast - slow < sourceLen) && inputArray[fast] == sourceArray[fast - slow] ) {
-          fast ++;
-        }
-        if (fast - slow == sourceLen) {
-          countSource ++;
-          set.add(slow);
-        } else {
-          fast = slow + 1;
-        }
+        set.add(i);
+        i += sourceLen;
+        countSource ++;
       }
     }
     // add non-source elements and replaced source (target) into result Array
     char[] resultArray = new char[inputLen + countSource * (targetLen - sourceLen)];
-    fast = 0;
-    int targetIndex = 0;
-    while (fast < inputLen) {
-      if(set.contains(fast)){
-        targetIndex = addTarget(resultArray, targetArray, targetIndex);
-        fast += sourceLen;
+    i = 0; // used loop throught inputArray
+    int resultIndex = 0; // used to add elements into resultArray
+    while (i < inputLen) {
+      if(set.contains(i)){
+        resultIndex = addTarget(resultArray, targetArray, resultIndex);
+        i += sourceLen;
       } else {
-        resultArray[targetIndex ++] = inputArray[fast ++];
+        resultArray[resultIndex ++] = inputArray[i ++];
       }
     }
     return new String(resultArray);
   }
+  // check whether substring of input starting with index j is source
+  private boolean equals(char[] inputArray, char[] sourceArray, int j) {
+    // corner case
+    if (j + sourceArray.length > inputArray.length) {
+      return false;
+    }
+    for (int i = 0; i < sourceArray.length; i++) {
+      if (inputArray[j + i] != sourceArray[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+  // used to add target chars into resultArray at index j
+  // returns the next index after adding the chars
   private int addTarget(char[] resultArray, char[] targetArray, int j) {
     for (int i = 0; i < targetArray.length; i ++) {
       resultArray[j + i] = targetArray[i];
