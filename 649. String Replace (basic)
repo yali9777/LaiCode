@@ -17,27 +17,28 @@ public class Solution {
     int countSource = 0;
     int i = 0; // used to loop through inputArray
     char start = sourceArray[0];
-    // count how many cources, and add the starting postion into a set
+    // count how many cources, and add the ending postion into a set
     HashSet<Integer> set = new HashSet<>();
     while (i < inputLen) {
       if (inputArray[i] != start || !equals(inputArray, sourceArray, i)) {
         i ++;
       } else {
-        set.add(i);
+        set.add(i + sourceLen - 1);
         i += sourceLen;
         countSource ++;
       }
     }
     // add non-source elements and replaced source (target) into result Array
     char[] resultArray = new char[inputLen + countSource * (targetLen - sourceLen)];
-    i = 0; // used loop throught inputArray
-    int resultIndex = 0; // used to add elements into resultArray
-    while (i < inputLen) {
+    i = inputLen - 1; // used loop throught inputArray
+    int resultIndex = resultArray.length - 1; // used to add elements into resultArray
+    // have to do it from the end to beginning so that it's an inplace modification
+    while (i >= 0) {
       if(set.contains(i)){
         resultIndex = addTarget(resultArray, targetArray, resultIndex);
-        i += sourceLen;
+        i -= sourceLen;
       } else {
-        resultArray[resultIndex ++] = inputArray[i ++];
+        resultArray[resultIndex --] = inputArray[i --];
       }
     }
     return new String(resultArray);
@@ -55,13 +56,13 @@ public class Solution {
     }
     return true;
   }
-  // used to add target chars into resultArray at index j
-  // returns the next index after adding the chars
+  // used to add target chars into resultArray ending at index j
+  // returns the next (backward) index after adding the chars
   private int addTarget(char[] resultArray, char[] targetArray, int j) {
     for (int i = 0; i < targetArray.length; i ++) {
-      resultArray[j + i] = targetArray[i];
+      resultArray[j - i] = targetArray[targetArray.length - 1 - i];
     }
-    return j + targetArray.length;
+    return j - targetArray.length;
   }
 }
 // Time: O(n)
